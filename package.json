@@ -11,17 +11,26 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "test": "bun test"
   },
-  "keywords": ["opencode", "plugin", "tts", "edge-tts", "voice"],
+  "keywords": [
+    "opencode",
+    "plugin",
+    "tts",
+    "edge-tts",
+    "voice"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@opencode-ai/plugin": "^1.17.9",
-    "typescript": "^5.5.0",
-    "@types/bun": "^1.1.0"
+    "@types/bun": "^1.1.0",
+    "@types/node": "^26.0.0",
+    "typescript": "^5.5.0"
   }
 }
