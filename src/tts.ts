@@ -1,4 +1,4 @@
-import { execFile } from "child_process";
+import { execFile, execFileSync } from "child_process";
 import { tmpdir } from "os";
 import { join } from "path";
 import { randomUUID } from "crypto";
@@ -6,6 +6,19 @@ import { unlink } from "fs/promises";
 import { promisify } from "util";
 
 const exec = promisify(execFile);
+
+function findPython(): string {
+  const candidates = ["python", "python3", "py"];
+  for (const exe of candidates) {
+    try {
+      const r = execFileSync(exe, ["--version"], { encoding: "utf8" });
+      if (r.includes("Python")) return exe;
+    } catch { /* try next */ }
+  }
+  return "python";
+}
+
+const pythonBin = findPython();
 
 function run(args: string[]): Promise<void> {
   return exec(args[0], args.slice(1)).then(() => {});
@@ -40,7 +53,7 @@ export async function speak(
   speaking = true;
   const tmpPath = join(tmpdir(), `oc-tts-${randomUUID()}.mp3`);
   try {
-    await run(["edge-tts", "--text", text, "--voice", voice, "--rate", rate, "--write-media", tmpPath]);
+    await run([pythonBin, "-m", "edge_tts", "--text", text, "--voice", voice, "--rate", rate, "--write-media", tmpPath]);
     if (process.platform === "win32") {
       await playWindows(tmpPath);
     } else {
