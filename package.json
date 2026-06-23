@@ -1,0 +1,27 @@
+{
+  "name": "opencode-tts",
+  "version": "0.1.0",
+  "description": "OpenCode plugin — reads AI responses aloud via edge-tts",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "test": "bun test"
+  },
+  "keywords": ["opencode", "plugin", "tts", "edge-tts", "voice"],
+  "license": "MIT",
+  "devDependencies": {
+    "@opencode-ai/plugin": "^1.17.9",
+    "typescript": "^5.5.0",
+    "@types/bun": "^1.1.0"
+  }
+}
