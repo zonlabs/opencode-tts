@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin";
+import type { Plugin, PluginOptions } from "@opencode-ai/plugin";
 import { parseConfig, type TTSConfig } from "./config";
 import { shouldSkip, stripForSpeech } from "./filter";
 import { speak } from "./tts";
@@ -28,8 +28,8 @@ function getPartText(part: any): string | null {
   return part?.type === "text" ? (part.text ?? null) : null;
 }
 
-export const TTSPlugin: Plugin = async (pluginCtx) => {
-  const config = parseConfig(pluginCtx);
+export const TTSPlugin: Plugin = async (pluginCtx, options) => {
+  const config = parseConfig(options ?? {});
   const client = pluginCtx.client as any;
 
   return {

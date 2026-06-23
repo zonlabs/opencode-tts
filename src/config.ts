@@ -12,13 +12,11 @@ export const DEFAULTS: TTSConfig = {
   trigger: "session.idle",
 };
 
-export function parseConfig(_ctx: any): TTSConfig {
+export function parseConfig(options: Record<string, unknown> = {}): TTSConfig {
   return {
-    voice: process.env.OPENCODE_TTS_VOICE ?? DEFAULTS.voice,
-    rate: process.env.OPENCODE_TTS_RATE ?? DEFAULTS.rate,
-    maxChars: Number(process.env.OPENCODE_TTS_MAX_CHARS) || DEFAULTS.maxChars,
-    trigger:
-      (process.env.OPENCODE_TTS_TRIGGER as TTSConfig["trigger"]) ??
-      DEFAULTS.trigger,
+    voice: (options.voice as string) ?? process.env.OPENCODE_TTS_VOICE ?? DEFAULTS.voice,
+    rate: (options.rate as string) ?? process.env.OPENCODE_TTS_RATE ?? DEFAULTS.rate,
+    maxChars: Number(options.maxChars ?? process.env.OPENCODE_TTS_MAX_CHARS) || DEFAULTS.maxChars,
+    trigger: (options.trigger as TTSConfig["trigger"]) ?? process.env.OPENCODE_TTS_TRIGGER ?? DEFAULTS.trigger,
   };
 }

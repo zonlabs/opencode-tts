@@ -2,7 +2,7 @@ import { execFile, execFileSync } from "child_process";
 import { tmpdir } from "os";
 import { join } from "path";
 import { randomUUID } from "crypto";
-import { unlink } from "fs/promises";
+import { unlink, writeFile } from "fs/promises";
 import { promisify } from "util";
 
 const exec = promisify(execFile);
@@ -25,17 +25,27 @@ function run(args: string[]): Promise<void> {
 }
 
 async function playWindows(path: string): Promise<void> {
-  const ps = `
-$mci = Add-Type -MemberDefinition @'
-[DllImport("winmm.dll")] public static extern int mciSendString(string c, System.Text.StringBuilder r, int l, System.IntPtr h);
-'@ -Name MCI -Namespace WinMM -PassThru;
-try {
-  $mci::mciSendString('open "${path}" type mpegvideo alias tts', $null, 0, [IntPtr]::Zero);
-  $mci::mciSendString('play tts wait', $null, 0, [IntPtr]::Zero);
-} finally {
-  $mci::mciSendString('close tts', $null, 0, [IntPtr]::Zero);
+  const csPath = join(tmpdir(), `oc-tts-mci-${randomUUID()}.cs`);
+  const csharp = `using System.Runtime.InteropServices;
+using System.Text;
+public class MciPlayer {
+  [DllImport("winmm.dll")]
+  public static extern int mciSendString(string c, StringBuilder r, int l, System.IntPtr h);
 }`;
-  await run(["powershell", "-NoProfile", "-Command", ps]);
+  const ps = `
+Add-Type -Path "${csPath}";
+try {
+  [MciPlayer]::mciSendString('open "${path}" type mpegvideo alias tts', $null, 0, [IntPtr]::Zero) | Out-Null;
+  [MciPlayer]::mciSendString('play tts wait', $null, 0, [IntPtr]::Zero) | Out-Null;
+} finally {
+  [MciPlayer]::mciSendString('close tts', $null, 0, [IntPtr]::Zero) | Out-Null;
+}`;
+  try {
+    await writeFile(csPath, csharp);
+    await run(["powershell", "-NoProfile", "-Command", ps]);
+  } finally {
+    await unlink(csPath).catch(() => {});
+  }
 }
 
 async function playUnix(path: string): Promise<void> {
