@@ -7,7 +7,7 @@ export interface TTSConfig {
 
 export const DEFAULTS: TTSConfig = {
   voice: "en-US-AriaNeural",
-  rate: "+0%",
+  rate: "+30%",
   maxChars: 800,
   trigger: "session.idle",
 };

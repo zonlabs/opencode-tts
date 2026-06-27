@@ -32,12 +32,20 @@ export const TTSPlugin: Plugin = async (pluginCtx, options) => {
   const config = parseConfig(options ?? {});
   const client = pluginCtx.client as any;
 
+  client.app.log({
+    body: { service: "opencode-tts", level: "info", message: `Plugin loaded (voice=${config.voice}, trigger=${config.trigger})` },
+  }).catch(() => {});
+
   return {
     event: async (input: { event: any }) => {
       const event = input?.event;
       if (!event) return;
 
       try {
+        client.app.log({
+          body: { service: "opencode-tts", level: "debug", message: `Event received: ${event.type}` },
+        }).catch(() => {});
+
         if (config.trigger === "session.idle" && event.type === "session.idle") {
           const sessionID = event.properties?.sessionID;
           if (!sessionID) return;
@@ -72,3 +80,4 @@ export const TTSPlugin: Plugin = async (pluginCtx, options) => {
 };
 
 export default TTSPlugin;
+export const server = TTSPlugin;
